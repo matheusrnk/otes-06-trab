@@ -34,6 +34,12 @@ public class PersonController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPerson);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<Person> loginPerson(@RequestParam("phoneNumber") String phoneNumber, @RequestParam("password") String password) {
+        Optional<Person> person = personService.authenticatePerson(phoneNumber, password);
+        return person.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable("id") Long id) {
         personService.deletePersonById(id);

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">client_contacts</string>
+    <string name="loginText">Login</string>
+    <string name="passwordHint">Password</string>
+    <string name="phone_numberHint">Phone Number</string>
+    <string name="app_logoText">App Logo</string>
+    <string name="registerText">Register</string>
+    <string name="forms_logoDescription">Forms logo</string>
+    <string name="nameHint">Name</string>
+    <string name="emailHint">Email</string>
+    <string name="backText">Back</string>
+</resources>

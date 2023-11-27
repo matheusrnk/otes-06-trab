@@ -21,6 +21,7 @@ public class Person {
     private String name;
     private String phoneNumber;
     private String email;
+    private String password;
     
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contact> contacts = new ArrayList<>();
