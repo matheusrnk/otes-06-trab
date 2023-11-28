@@ -9,4 +9,23 @@
     <string name="nameHint">Name</string>
     <string name="emailHint">Email</string>
     <string name="backText">Back</string>
+    <string name="logoutText">Logout</string>
+    <string name="profileTitle">Profile</string>
+    <string name="add_contactTitle">Add Contact</string>
+    <string name="search_contactTitle">Search Contact</string>
+    <string name="contactDescription">Contact</string>
+    <string name="nameTextContact">Name</string>
+    <string name="phone_numberTextContact">Phone Number</string>
+    <string name="emailTextContact">Email</string>
+    <string name="backButtonDescription">Back Button</string>
+    <string name="emailPlaceholder">Email: johndoe@example.com</string>
+    <string name="phonePlaceholder">Phone: 123-456-7890</string>
+    <string name="namePlaceholder">Name: John Doe</string>
+    <string name="profile_iconDescription">Profile Icon</string>
+    <string name="nameTextProfile">"Name: "</string>
+    <string name="phoneTextProfile">"Phone: "</string>
+    <string name="emailTextProfile">"Email: "</string>
+    <string name="addContactText">Add</string>
+    <string name="contact_nameHint">Contact Name</string>
+    <string name="PhotoDescription">Photo</string>
 </resources>

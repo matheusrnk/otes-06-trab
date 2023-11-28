@@ -33,6 +33,15 @@
         <activity
             android:name=".HomeActivity">
         </activity>
+        <activity
+            android:name=".ProfileActivity">
+        </activity>
+        <activity
+            android:name=".AddContactActivity">
+        </activity>
+        <activity
+            android:name=".SearchContactActivity">
+        </activity>
     </application>
 
 </manifest>

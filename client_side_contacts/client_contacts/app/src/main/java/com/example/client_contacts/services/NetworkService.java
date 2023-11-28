@@ -1,10 +1,16 @@
 package com.example.client_contacts.services;
 
+import androidx.annotation.NonNull;
+
+import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
+import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkService {
@@ -28,6 +34,47 @@ public class NetworkService {
     public void loginUser(String phoneNumber, String password, Callback<PersonModel> callback) {
         Call<PersonModel> call = apiService.loginPerson(phoneNumber, password);
         call.enqueue(callback);
+    }
+
+    public void personById(Long id, Callback<PersonModel> callback){
+        Call<PersonModel> call = apiService.getPersonById(id);
+        call.enqueue(callback);
+    }
+
+    public void addContactToPerson(Long id, ContactModel contactModel, Callback<ContactModel> callback){
+        Call<ContactModel> call = apiService.addContactToPerson(id, contactModel);
+        call.enqueue(callback);
+    }
+
+    public interface ContactListListener {
+        void onContactListReceived(List<ContactModel> contactList);
+        void onContactListError(String errorMessage);
+    }
+
+    public void getContactListForPerson(Long personId, final ContactListListener listener) {
+        Call<PersonModel> call = apiService.getPersonById(personId);
+
+        call.enqueue(new Callback<PersonModel>() {
+            @Override
+            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
+                if (response.isSuccessful()) {
+                    PersonModel personModel = response.body();
+                    if (personModel != null) {
+                        List<ContactModel> contactList = personModel.getContactsModelList();
+                        listener.onContactListReceived(contactList);
+                    } else {
+                        listener.onContactListError("PersonModel is null");
+                    }
+                } else {
+                    listener.onContactListError("Unsuccessful response: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
+                listener.onContactListError("Failed to fetch data: " + t.getMessage());
+            }
+        });
     }
 }
 

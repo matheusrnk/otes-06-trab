@@ -67,10 +67,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
                 if(response.isSuccessful()){
                     PersonModel personModelDeserialized = response.body();
-                    //do something
+
                     int statusCode = response.code();
                     Log.i("Request Complete", "Successful response: " + response.code());
-                    goToHomeActivity();
+                    assert personModelDeserialized != null;
+                    goToHomeActivity(personModelDeserialized);
                 } else {
                     int statusCode = response.code();
                     Log.e("Request Failed", "Unsuccessful response: " + response.code());
@@ -90,8 +91,9 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void goToHomeActivity(){
+    private void goToHomeActivity(PersonModel personLogged){
         Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra("loggedPerson", personLogged);
         startActivity(intent);
     }
 
