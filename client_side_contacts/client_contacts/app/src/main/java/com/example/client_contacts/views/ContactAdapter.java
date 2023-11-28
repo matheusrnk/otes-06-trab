@@ -47,6 +47,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     public void updateContactList(List<ContactModel> updatedContacts) {
         this.contactList = updatedContacts;
+        notifyDataSetChanged();
     }
 
     public static class ContactViewHolder extends RecyclerView.ViewHolder {

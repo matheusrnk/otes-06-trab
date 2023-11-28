@@ -1,4 +1,4 @@
-package com.example.client_contacts;
+package com.example.client_contacts.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.client_contacts.R;
 import com.example.client_contacts.models.PersonModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

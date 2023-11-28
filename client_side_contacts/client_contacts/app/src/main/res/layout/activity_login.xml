@@ -49,6 +49,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/loginText"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/blue"
         android:paddingStart="32dp"
         android:paddingEnd="32dp"/>
 
@@ -58,6 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/buttonLogin"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/blue"
         android:layout_marginTop="16dp"
         android:text="@string/registerText" />
 

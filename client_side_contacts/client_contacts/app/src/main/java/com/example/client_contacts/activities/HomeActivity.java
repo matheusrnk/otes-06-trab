@@ -1,46 +1,36 @@
-package com.example.client_contacts;
+package com.example.client_contacts.activities;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.client_contacts.R;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
 import com.example.client_contacts.views.ContactAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerViewContacts;
+    private RecyclerView recyclerView;
     private ContactAdapter contactAdapter;
     private List<ContactModel> contactList;
 
     private Button btnLogout;
     private BottomNavigationView bottomNavigationView;
+    private ActivityResultLauncher<Intent> launchAddContactActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +80,30 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
 
+        launchAddContactActivity = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        if (result.getData() != null) {
+                            Long id = result.getData().getLongExtra("addedContactToPersonId", -1);
+
+                            NetworkService networkService = new NetworkService();
+
+                           networkService.getContactListForPerson(id, new NetworkService.ContactListListener() {
+                               @Override
+                               public void onContactListReceived(List<ContactModel> contactList) {
+                                   contactAdapter.updateContactList(contactList);
+                               }
+
+                               @Override
+                               public void onContactListError(String errorMessage) {
+
+                               }
+                           });
+                        }
+                    } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+                        Log.e("Failed!", "Activity Canceled");
+                    }
+                });
 
     }
 
@@ -110,9 +124,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void displayContactList(List<ContactModel> contactList) {
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewContacts);
+        recyclerView = findViewById(R.id.recyclerViewContacts);
 
-        ContactAdapter contactAdapter = new ContactAdapter(contactList, this);
+        contactAdapter = new ContactAdapter(contactList, this);
         recyclerView.setAdapter(contactAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -126,7 +140,8 @@ public class HomeActivity extends AppCompatActivity {
     private void goToAddContactActivity(PersonModel personLogged){
         Intent intent = new Intent(this, AddContactActivity.class);
         intent.putExtra("loggedPerson", personLogged);
-        startActivity(intent);
+
+        launchAddContactActivity.launch(intent);
     }
 
 

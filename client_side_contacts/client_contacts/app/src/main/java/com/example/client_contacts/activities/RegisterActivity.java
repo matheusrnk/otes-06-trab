@@ -1,4 +1,4 @@
-package com.example.client_contacts;
+package com.example.client_contacts.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.client_contacts.R;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
 
@@ -68,9 +69,10 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
                 if(response.isSuccessful()){
                     PersonModel personModelDeserialized = response.body();
-                    //do something
+
                     int statusCode = response.code();
-                    Log.e("Request Failed", "Successful response: " + response.code());
+                    Log.e("Request Succeed", "Successful response: " + response.code());
+                    finish();
                 } else {
                     int statusCode = response.code();
                     Log.e("Request Failed", "Unsuccessful response: " + response.code());

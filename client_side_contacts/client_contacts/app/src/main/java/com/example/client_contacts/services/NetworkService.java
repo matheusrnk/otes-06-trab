@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -44,6 +45,10 @@ public class NetworkService {
     public void addContactToPerson(Long id, ContactModel contactModel, Callback<ContactModel> callback){
         Call<ContactModel> call = apiService.addContactToPerson(id, contactModel);
         call.enqueue(callback);
+    }
+
+    public List<ContactModel> searchContacts(String query) {
+        return new ArrayList<>();
     }
 
     public interface ContactListListener {

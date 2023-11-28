@@ -1,4 +1,4 @@
-package com.example.client_contacts;
+package com.example.client_contacts.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.client_contacts.R;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
 
