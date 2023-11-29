@@ -17,6 +17,18 @@
         android:layout_marginBottom="32dp"
         android:contentDescription="@string/app_logoText" />
 
+    <TextView
+        android:id="@+id/textViewErrorLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageViewLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:textColor="@color/red"
+        android:textSize="14sp"
+        android:visibility="gone"
+        android:text="@string/errorMessageLogin" />
+
     <EditText
         android:id="@+id/editTextPhoneNumberLogin"
         android:layout_width="match_parent"

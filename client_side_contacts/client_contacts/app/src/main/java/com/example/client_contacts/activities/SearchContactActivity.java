@@ -13,10 +13,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.client_contacts.R;
+import com.example.client_contacts.interfaces.ContactDeletedListener;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
@@ -139,5 +141,6 @@ public class SearchContactActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 }
 

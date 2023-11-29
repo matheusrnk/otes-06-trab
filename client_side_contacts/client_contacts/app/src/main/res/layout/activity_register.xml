@@ -12,6 +12,18 @@
         android:src="@drawable/register_logo"
         android:contentDescription="@string/forms_logoDescription" />
 
+    <TextView
+        android:id="@+id/textViewErrorRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageViewLogoRegister"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:textColor="@color/red"
+        android:textSize="14sp"
+        android:visibility="gone"
+        android:text="@string/errorMessageRegister" />
+
     <EditText
         android:id="@+id/editTextNameRegister"
         android:layout_width="match_parent"

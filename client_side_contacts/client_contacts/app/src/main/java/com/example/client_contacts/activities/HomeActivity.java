@@ -12,11 +12,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.client_contacts.R;
 import com.example.client_contacts.interfaces.ContactAddedListener;
+import com.example.client_contacts.interfaces.ContactDeletedListener;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
@@ -207,6 +209,30 @@ public class HomeActivity extends AppCompatActivity implements ContactAddedListe
                 }
             }
         });
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("Lifecycle", "onRestart() called");
+        if (getIntent().hasExtra("loggedPerson")) {
+            PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
+
+            NetworkService networkService = new NetworkService();
+
+            assert loggedPerson != null;
+            networkService.getContactListForPerson(loggedPerson.getId(), new NetworkService.ContactListListener() {
+                @Override
+                public void onContactListReceived(List<ContactModel> contactList) {
+                    contactAdapter.updateContactList(contactList);
+                }
+
+                @Override
+                public void onContactListError(String errorMessage) {
+
+                }
+            });
+        }
     }
 
 }

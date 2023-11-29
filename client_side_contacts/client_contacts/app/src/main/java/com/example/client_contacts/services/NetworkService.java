@@ -48,6 +48,11 @@ public class NetworkService {
         call.enqueue(callback);
     }
 
+    public void deleteContact(Long id, Callback<Void> callback){
+        Call<Void> call = apiService.deleteContact(id);
+        call.enqueue(callback);
+    }
+
     public List<ContactModel> searchContacts(String query) {
 
         return new ArrayList<>();

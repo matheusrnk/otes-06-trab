@@ -1,21 +1,31 @@
 package com.example.client_contacts.views;
 
+import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.client_contacts.R;
+import com.example.client_contacts.interfaces.ContactDeletedListener;
 import com.example.client_contacts.models.ContactModel;
+import com.example.client_contacts.services.NetworkService;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
 import android.widget.ImageView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
 
@@ -38,6 +48,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         ContactModel contact = contactList.get(position);
         holder.bind(contact);
+
+        holder.itemView.setOnLongClickListener(v -> {
+            deleteItem(position);
+            return true;
+        });
     }
 
     @Override
@@ -48,6 +63,35 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     public void updateContactList(List<ContactModel> updatedContacts) {
         this.contactList = updatedContacts;
         notifyDataSetChanged();
+    }
+
+    private void deleteItem(int position) {
+        NetworkService networkService = new NetworkService();
+        ContactModel contactToBeDeleted = contactList.get(position);
+
+        networkService.deleteContact(contactToBeDeleted.getId(), new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if(response.isSuccessful()){
+                    contactList.remove(position);
+                    notifyItemRemoved(position);
+                    showDeletionFeedback();
+                    Log.i("Success", "Contact Deleted");
+                    return;
+                }
+                Log.i("Failed", "Contact Not Deleted!");
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Log.e("Failed", "Contact Not Deleted! " + t.getMessage());
+            }
+        });
+    }
+
+    private void showDeletionFeedback() {
+        Snackbar.make(((Activity) context).findViewById(android.R.id.content),
+                "Contact deleted", Snackbar.LENGTH_SHORT).show();
     }
 
     public static class ContactViewHolder extends RecyclerView.ViewHolder {
@@ -77,5 +121,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             }
         }
     }
+
 }
 

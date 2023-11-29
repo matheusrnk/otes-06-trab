@@ -28,4 +28,7 @@
     <string name="addContactText">Add</string>
     <string name="contact_nameHint">Contact Name</string>
     <string name="PhotoDescription">Photo</string>
+    <string name="errorMessageLogin">Invalid phone number or password. Please try again.</string>
+    <string name="errorMessageRegister">It wasn\'t possible to register you. Please try again.</string>
+    <string name="errorMessageAddContact">It wasn\'t possible to add the contact. Please try again.</string>
 </resources>

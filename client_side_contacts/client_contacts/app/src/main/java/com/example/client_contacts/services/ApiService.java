@@ -5,6 +5,7 @@ import com.example.client_contacts.models.PersonModel;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -24,4 +25,7 @@ public interface ApiService {
 
     @GET("persons/{id}")
     Call<PersonModel> getPersonById(@Path("id") Long id);
+
+    @DELETE("contacts/{id}")
+    Call<Void> deleteContact(@Path("id") Long id);
 }

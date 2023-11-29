@@ -32,6 +32,18 @@
         android:padding="16dp"
         android:contentDescription="@string/PhotoDescription" />
 
+    <TextView
+        android:id="@+id/textViewErrorAddContact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imagePhoto"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:textColor="@color/red"
+        android:textSize="14sp"
+        android:visibility="gone"
+        android:text="@string/errorMessageAddContact" />
+
     <EditText
         android:id="@+id/editTextContactName"
         android:layout_width="match_parent"
