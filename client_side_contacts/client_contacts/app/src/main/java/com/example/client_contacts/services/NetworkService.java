@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class NetworkService {
         call.enqueue(callback);
     }
 
-    public void personById(Long id, Callback<PersonModel> callback){
+    public void personById(Long id, Callback<PersonModel> callback) {
         Call<PersonModel> call = apiService.getPersonById(id);
         call.enqueue(callback);
     }
@@ -48,6 +49,7 @@ public class NetworkService {
     }
 
     public List<ContactModel> searchContacts(String query) {
+
         return new ArrayList<>();
     }
 

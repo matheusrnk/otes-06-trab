@@ -88,12 +88,14 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddContactActivity.class);
         intent.putExtra("loggedPerson", personLogged);
         startActivity(intent);
+        finish();
     }
 
     private void goToSearchContactActivity(PersonModel personLogged){
         Intent intent = new Intent(this, SearchContactActivity.class);
         intent.putExtra("loggedPerson", personLogged);
         startActivity(intent);
+        finish();
     }
 }
 

@@ -15,11 +15,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.client_contacts.R;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
+import com.example.client_contacts.views.ContactViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import retrofit2.Call;
@@ -33,6 +36,8 @@ public class AddContactActivity extends AppCompatActivity {
     private ImageView imagePhoto;
     private BottomNavigationView bottomNavigationView;
     private Button buttonAddContact;
+
+    private ContactViewModel contactViewModel = ContactViewModel.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +110,8 @@ public class AddContactActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<ContactModel> call, @NonNull Response<ContactModel> response) {
                 if(response.isSuccessful()){
                     Log.i("Success!", "Contact Sent!");
-                    setResultAndFinish(id);
+                    contactViewModel.setContactAdded(true);
+                    finish();
                     return;
                 }
                 Log.e("Did not succeeded!", "Contact Not Sent!");
@@ -135,12 +141,14 @@ public class AddContactActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra("loggedPerson", personLogged);
         startActivity(intent);
+        finish();
     }
 
     private void goToSearchContactActivity(PersonModel personLogged){
         Intent intent = new Intent(this, SearchContactActivity.class);
         intent.putExtra("loggedPerson", personLogged);
         startActivity(intent);
+        finish();
     }
 }
 

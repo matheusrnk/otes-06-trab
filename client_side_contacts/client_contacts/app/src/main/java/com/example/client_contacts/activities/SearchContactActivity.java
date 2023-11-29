@@ -26,6 +26,12 @@ import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SearchContactActivity extends AppCompatActivity {
 
@@ -92,30 +98,6 @@ public class SearchContactActivity extends AppCompatActivity {
             }
         });
 
-        launchAddContactActivity = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        if (result.getData() != null) {
-                            Long id = result.getData().getLongExtra("addedContactToPersonId", -1);
-
-                            NetworkService networkService = new NetworkService();
-
-                            networkService.getContactListForPerson(id, new NetworkService.ContactListListener() {
-                                @Override
-                                public void onContactListReceived(List<ContactModel> contactList) {
-                                    contactAdapter.updateContactList(contactList);
-                                }
-
-                                @Override
-                                public void onContactListError(String errorMessage) {
-
-                                }
-                            });
-                        }
-                    } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-                        Log.e("Failed!", "Activity Canceled");
-                    }
-                });
     }
 
     private void performSearch(String query) {
@@ -128,20 +110,34 @@ public class SearchContactActivity extends AppCompatActivity {
 
     private List<ContactModel> getSearchResultsFromAPI(String query) {
         NetworkService networkService = new NetworkService();
-        return networkService.searchContacts(query);
+        if (getIntent().hasExtra("loggedPerson")) {
+            PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
+
+            assert loggedPerson != null;
+            List<ContactModel> contactModels = loggedPerson.getContactsModelList();
+            return filterContacts(query, contactModels);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<ContactModel> filterContacts(String query, List<ContactModel> contactModels) {
+        return contactModels.stream().filter(contactModel -> contactModel.getContactName().toLowerCase(Locale.getDefault())
+                .contains(query.toLowerCase(Locale.getDefault()))).collect(Collectors.toList());
     }
 
     private void goToProfileActivity(PersonModel personLogged){
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra("loggedPerson", personLogged);
         startActivity(intent);
+        finish();
     }
 
     private void goToAddContactActivity(PersonModel personLogged){
         Intent intent = new Intent(this, AddContactActivity.class);
         intent.putExtra("loggedPerson", personLogged);
 
-        launchAddContactActivity.launch(intent);
+        startActivity(intent);
+        finish();
     }
 }
 

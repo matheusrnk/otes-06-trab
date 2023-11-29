@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">client_contacts</string>
+    <string name="app_name">Contacts</string>
     <string name="loginText">Login</string>
     <string name="passwordHint">Password</string>
     <string name="phone_numberHint">Phone Number</string>

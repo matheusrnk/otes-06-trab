@@ -22,6 +22,10 @@ public class PersonModel implements Serializable {
     private String password;
     private List<ContactModel> contacts;
 
+    public PersonModel() {
+
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

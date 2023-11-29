@@ -9,20 +9,29 @@ import android.widget.Button;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.client_contacts.R;
+import com.example.client_contacts.interfaces.ContactAddedListener;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
 import com.example.client_contacts.views.ContactAdapter;
+import com.example.client_contacts.views.ContactViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.IOException;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class HomeActivity extends AppCompatActivity implements ContactAddedListener {
 
     private RecyclerView recyclerView;
     private ContactAdapter contactAdapter;
@@ -31,6 +40,8 @@ public class HomeActivity extends AppCompatActivity {
     private Button btnLogout;
     private BottomNavigationView bottomNavigationView;
     private ActivityResultLauncher<Intent> launchAddContactActivity;
+
+    private ContactViewModel contactViewModel = ContactViewModel.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,18 +72,21 @@ public class HomeActivity extends AppCompatActivity {
             if(itemId == R.id.nav_profile){
                 if (getIntent().hasExtra("loggedPerson")) {
                     PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
+                    assert loggedPerson != null;
                     goToProfileActivity(loggedPerson);
                 }
                 return true;
             } else if(itemId == R.id.nav_add_contact){
                 if (getIntent().hasExtra("loggedPerson")) {
                     PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
+                    assert loggedPerson != null;
                     goToAddContactActivity(loggedPerson);
                 }
                 return true;
             } else if(itemId == R.id.nav_search_contact){
                 if (getIntent().hasExtra("loggedPerson")) {
                     PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
+                    assert loggedPerson != null;
                     goToSearchContactActivity(loggedPerson);
                 }
                 return true;
@@ -80,30 +94,7 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
 
-        launchAddContactActivity = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        if (result.getData() != null) {
-                            Long id = result.getData().getLongExtra("addedContactToPersonId", -1);
-
-                            NetworkService networkService = new NetworkService();
-
-                           networkService.getContactListForPerson(id, new NetworkService.ContactListListener() {
-                               @Override
-                               public void onContactListReceived(List<ContactModel> contactList) {
-                                   contactAdapter.updateContactList(contactList);
-                               }
-
-                               @Override
-                               public void onContactListError(String errorMessage) {
-
-                               }
-                           });
-                        }
-                    } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-                        Log.e("Failed!", "Activity Canceled");
-                    }
-                });
+        contactViewModel.setContactAddedListener(this);
 
     }
 
@@ -132,23 +123,90 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void goToProfileActivity(PersonModel personLogged){
-        Intent intent = new Intent(this, ProfileActivity.class);
-        intent.putExtra("loggedPerson", personLogged);
-        startActivity(intent);
+        NetworkService networkService = new NetworkService();
+        networkService.personById(personLogged.getId(), new Callback<PersonModel>() {
+            @Override
+            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
+                if(response.isSuccessful()){
+                    PersonModel updatedPerson = response.body();
+                    Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                    intent.putExtra("loggedPerson", updatedPerson);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 
     private void goToAddContactActivity(PersonModel personLogged){
-        Intent intent = new Intent(this, AddContactActivity.class);
-        intent.putExtra("loggedPerson", personLogged);
+        NetworkService networkService = new NetworkService();
+        networkService.personById(personLogged.getId(), new Callback<PersonModel>() {
+            @Override
+            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
+                if(response.isSuccessful()){
+                    PersonModel updatedPerson = response.body();
+                    Intent intent = new Intent(HomeActivity.this, AddContactActivity.class);
+                    intent.putExtra("loggedPerson", updatedPerson);
+                    startActivity(intent);
+                }
+            }
 
-        launchAddContactActivity.launch(intent);
+            @Override
+            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 
 
     private void goToSearchContactActivity(PersonModel personLogged){
-        Intent intent = new Intent(this, SearchContactActivity.class);
-        intent.putExtra("loggedPerson", personLogged);
-        startActivity(intent);
+        NetworkService networkService = new NetworkService();
+        networkService.personById(personLogged.getId(), new Callback<PersonModel>() {
+            @Override
+            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
+                if(response.isSuccessful()){
+                    PersonModel updatedPerson = response.body();
+                    Intent intent = new Intent(HomeActivity.this, SearchContactActivity.class);
+                    intent.putExtra("loggedPerson", updatedPerson);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onContactAdded() {
+        contactViewModel.isContactAdded().observe(this, isAdded -> {
+            if (isAdded) {
+                if (getIntent().hasExtra("loggedPerson")) {
+                    PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
+
+                    NetworkService networkService = new NetworkService();
+
+                    assert loggedPerson != null;
+                    networkService.getContactListForPerson(loggedPerson.getId(), new NetworkService.ContactListListener() {
+                        @Override
+                        public void onContactListReceived(List<ContactModel> contactList) {
+                            contactAdapter.updateContactList(contactList);
+                        }
+
+                        @Override
+                        public void onContactListError(String errorMessage) {
+
+                        }
+                    });
+                }
+            }
+        });
     }
 
 }
