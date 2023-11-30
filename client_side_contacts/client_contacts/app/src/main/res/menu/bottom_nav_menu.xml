@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_profile"
+        android:title="@string/profileTitle"
+        android:icon="@drawable/baseline_person_24" />
+
+    <item
+        android:id="@+id/nav_add_contact"
+        android:title="@string/add_contactTitle"
+        android:icon="@drawable/baseline_person_add_24" />
+
+    <item
+        android:id="@+id/nav_search_contact"
+        android:title="@string/search_contactTitle"
+        android:icon="@drawable/baseline_person_search_24" />
+</menu>
