@@ -1,4 +1,4 @@
-package com.example.client_contacts.interfaces;
+package com.example.client_contacts.views.listeners;
 
 public interface ContactAddedListener {
     void onContactAdded();

@@ -1,7 +1,8 @@
-package com.example.client_contacts.activities;
+package com.example.client_contacts.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -38,38 +39,32 @@ public class ProfileActivity extends AppCompatActivity {
 
         ImageButton backButton = findViewById(R.id.backButtonToolbar);
 
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
+        bottomNavigationView.setOnItemSelectedListener(this::guideBottomButtonActions);
 
-            if(itemId == R.id.nav_add_contact){
-                goToAddContactActivity(loggedPerson);
-                return true;
-            } else if(itemId == R.id.nav_search_contact){
-                goToSearchContactActivity(loggedPerson);
-                return true;
-            }
-            return false;
-        });
-
-        backButton.setOnClickListener(v -> onSupportNavigateUp());
+        backButton.setOnClickListener(v -> finish());
 
         fetchAndDisplayProfileDetails();
     }
 
-    private void fetchAndDisplayProfileDetails() {
-        PersonModel loggedInPerson = loggedPerson;
+    private boolean guideBottomButtonActions(MenuItem menuItem) {
+        int itemId = menuItem.getItemId();
 
-        if (loggedInPerson != null) {
-            textName.setText(MessageFormat.format("{0}{1}", getString(R.string.nameTextProfile), loggedInPerson.getName()));
-            textPhoneNumber.setText(MessageFormat.format("{0}{1}", getString(R.string.phoneTextProfile), loggedInPerson.getPhoneNumber()));
-            textEmail.setText(MessageFormat.format("{0}{1}", getString(R.string.emailTextProfile), loggedInPerson.getEmail()));
+        if(itemId == R.id.nav_add_contact){
+            goToAddContactActivity(loggedPerson);
+            return true;
+        } else if(itemId == R.id.nav_search_contact){
+            goToSearchContactActivity(loggedPerson);
+            return true;
         }
+        return false;
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
+    private void fetchAndDisplayProfileDetails() {
+        if (loggedPerson != null) {
+            textName.setText(MessageFormat.format("{0}{1}", getString(R.string.nameTextProfile), loggedPerson.getName()));
+            textPhoneNumber.setText(MessageFormat.format("{0}{1}", getString(R.string.phoneTextProfile), loggedPerson.getPhoneNumber()));
+            textEmail.setText(MessageFormat.format("{0}{1}", getString(R.string.emailTextProfile), loggedPerson.getEmail()));
+        }
     }
 
     private void goToAddContactActivity(PersonModel personLogged){

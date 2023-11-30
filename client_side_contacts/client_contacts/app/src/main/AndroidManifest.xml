@@ -16,7 +16,7 @@
         android:theme="@style/Theme.Client_contacts"
         tools:targetApi="31">
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".views.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,22 +25,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.LoginActivity">
+            android:name=".views.activities.LoginActivity">
         </activity>
         <activity
-            android:name=".activities.RegisterActivity">
+            android:name=".views.activities.RegisterActivity">
         </activity>
         <activity
-            android:name=".activities.HomeActivity">
+            android:name=".views.activities.HomeActivity">
         </activity>
         <activity
-            android:name=".activities.ProfileActivity">
+            android:name=".views.activities.ProfileActivity">
         </activity>
         <activity
-            android:name=".activities.AddContactActivity">
+            android:name=".views.activities.AddContactActivity">
         </activity>
         <activity
-            android:name=".activities.SearchContactActivity">
+            android:name=".views.activities.SearchContactActivity">
         </activity>
     </application>
 

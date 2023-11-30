@@ -4,16 +4,18 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.client_contacts.interfaces.ContactAddedListener;
+import com.example.client_contacts.views.listeners.ContactAddedListener;
 
 public class ContactViewModel extends ViewModel {
 
     private static ContactViewModel instance = null;
 
-    private final MutableLiveData<Boolean> contactAdded = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> contactAdded;
     private ContactAddedListener contactAddedListener;
 
-    private ContactViewModel(){}
+    private ContactViewModel(){
+        contactAdded = new MutableLiveData<>();
+    }
 
     public static ContactViewModel getInstance(){
         if(instance == null){

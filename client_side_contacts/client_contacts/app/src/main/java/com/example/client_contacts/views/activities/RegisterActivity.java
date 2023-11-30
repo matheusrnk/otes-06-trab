@@ -1,23 +1,18 @@
-package com.example.client_contacts.activities;
+package com.example.client_contacts.views.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.client_contacts.R;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
+import com.example.client_contacts.services.services_callbacks.RegisterCallback;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
@@ -40,7 +35,8 @@ public class RegisterActivity extends AppCompatActivity implements Validator.Val
     private EditText editTextEmail;
 
     @NotEmpty(message = "Password is required")
-    @Pattern(regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$", message = "Password must contain at least 8 characters, including letters and numbers!")
+    @Pattern(regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$",
+            message = "Password must contain at least 8 characters, including letters and numbers!")
     private EditText editTextPassword;
     private TextView errorTextView;
 
@@ -73,7 +69,8 @@ public class RegisterActivity extends AppCompatActivity implements Validator.Val
         backButton.setOnClickListener(v -> finish());
     }
 
-    private void registerUserMethod(NetworkService networkService){
+    @Override
+    public void onValidationSucceeded() {
         String name = editTextName.getText().toString();
         String phoneNumber = editTextPhoneNumber.getText().toString();
         String email = editTextEmail.getText().toString();
@@ -81,30 +78,7 @@ public class RegisterActivity extends AppCompatActivity implements Validator.Val
 
         PersonModel personModel = new PersonModel(name, phoneNumber, email, password);
 
-        networkService.registerUser(personModel, new Callback<PersonModel>() {
-            @Override
-            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
-                if(response.isSuccessful()){
-                    Log.e("Request Succeed", "Successful response: " + response.code());
-                    errorTextView.setVisibility(View.GONE);
-                    finish();
-                } else {
-                    Log.e("Request Failed", "Unsuccessful response: " + response.code());
-                    errorTextView.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
-                Log.e("Request Failed", "Error: " + t.getMessage());
-                errorTextView.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    @Override
-    public void onValidationSucceeded() {
-        registerUserMethod(networkService);
+        networkService.registerPerson(personModel, new RegisterCallback(errorTextView, this));
     }
 
     @Override

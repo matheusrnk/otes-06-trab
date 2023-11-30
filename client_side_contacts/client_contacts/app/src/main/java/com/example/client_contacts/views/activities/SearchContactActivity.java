@@ -1,11 +1,10 @@
-package com.example.client_contacts.activities;
+package com.example.client_contacts.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageButton;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,14 +15,13 @@ import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.views.ContactAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class SearchContactActivity extends AppCompatActivity {
+public class SearchContactActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private RecyclerView recyclerViewSearchResults;
     private List<ContactModel> searchResults;
@@ -44,56 +42,43 @@ public class SearchContactActivity extends AppCompatActivity {
         retrieveLoggedPerson();
 
         ImageButton backButton = findViewById(R.id.backButtonToolbarSearchContact);
+        SearchView searchView = findViewById(R.id.searchView);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationViewSearchContact);
 
         recyclerViewSearchResults = findViewById(R.id.recyclerViewSearchResults);
         recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(this));
         searchResults = new ArrayList<>();
 
-        SearchView searchView = findViewById(R.id.searchView);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                performSearch(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                performSearch(newText);
-                return false;
-            }
-        });
-
         backButton.setOnClickListener(v -> finish());
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
+        searchView.setOnQueryTextListener(this);
 
-                if(itemId == R.id.nav_profile){
-                    goToProfileActivity(loggedPerson);
-                    return true;
-                } else if(itemId == R.id.nav_add_contact){
-                    goToAddContactActivity(loggedPerson);
-                    return true;
-                }
-                return false;
-            }
-        });
+        bottomNavigationView.setOnItemSelectedListener(this::guideBottomButtonActions);
 
+    }
+
+    private boolean guideBottomButtonActions(MenuItem menuItem) {
+        int itemId = menuItem.getItemId();
+
+        if(itemId == R.id.nav_profile){
+            goToProfileActivity(loggedPerson);
+            return true;
+        } else if(itemId == R.id.nav_add_contact){
+            goToAddContactActivity(loggedPerson);
+            return true;
+        }
+        return false;
     }
 
     private void performSearch(String query) {
         searchResults.clear();
-        searchResults.addAll(getSearchResultsFromAPI(query));
+        searchResults.addAll(getSearchResults(query));
 
         ContactAdapter contactAdapter = new ContactAdapter(searchResults, this);
         recyclerViewSearchResults.setAdapter(contactAdapter);
     }
 
-    private List<ContactModel> getSearchResultsFromAPI(String query) {
+    private List<ContactModel> getSearchResults(String query) {
         List<ContactModel> contactModels = loggedPerson.getContactsModelList();
         if(contactModels == null){
             return new ArrayList<>();
@@ -106,6 +91,18 @@ public class SearchContactActivity extends AppCompatActivity {
                 .contains(query.toLowerCase(Locale.getDefault()))).collect(Collectors.toList());
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        performSearch(query);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        performSearch(newText);
+        return false;
+    }
+
     private void goToProfileActivity(PersonModel personLogged){
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra("loggedPerson", personLogged);
@@ -116,10 +113,8 @@ public class SearchContactActivity extends AppCompatActivity {
     private void goToAddContactActivity(PersonModel personLogged){
         Intent intent = new Intent(this, AddContactActivity.class);
         intent.putExtra("loggedPerson", personLogged);
-
         startActivity(intent);
         finish();
     }
-
 }
 

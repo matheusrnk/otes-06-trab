@@ -1,29 +1,26 @@
-package com.example.client_contacts.activities;
+package com.example.client_contacts.views.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.client_contacts.R;
-import com.example.client_contacts.interfaces.ContactAddedListener;
+import com.example.client_contacts.views.listeners.ContactAddedListener;
+import com.example.client_contacts.views.listeners.ContactListListener;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
+import com.example.client_contacts.services.services_callbacks.UpdatedPersonCallback;
 import com.example.client_contacts.views.ContactAdapter;
 import com.example.client_contacts.views.ContactViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity implements ContactAddedListener {
 
@@ -60,28 +57,30 @@ public class HomeActivity extends AppCompatActivity implements ContactAddedListe
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-
-            if(itemId == R.id.nav_profile){
-                goToProfileActivity(loggedPerson);
-                return true;
-            } else if(itemId == R.id.nav_add_contact){
-                goToAddContactActivity(loggedPerson);
-                return true;
-            } else if(itemId == R.id.nav_search_contact){
-                goToSearchContactActivity(loggedPerson);
-                return true;
-            }
-            return false;
-        });
+        bottomNavigationView.setOnItemSelectedListener(this::guideBottomButtonActions);
 
         contactViewModel.setContactAddedListener(this);
 
     }
 
+    private boolean guideBottomButtonActions(MenuItem menuItem) {
+        int itemId = menuItem.getItemId();
+
+        if(itemId == R.id.nav_profile){
+            goToProfileActivity(loggedPerson);
+            return true;
+        } else if(itemId == R.id.nav_add_contact){
+            goToAddContactActivity(loggedPerson);
+            return true;
+        } else if(itemId == R.id.nav_search_contact){
+            goToSearchContactActivity(loggedPerson);
+            return true;
+        }
+        return false;
+    }
+
     private void getContactList(Long personId) {
-        networkService.getContactListForPerson(personId, new NetworkService.ContactListListener() {
+        networkService.getContactListForPerson(personId, new ContactListListener() {
             @Override
             public void onContactListReceived(List<ContactModel> contactList) {
                 displayContactList(contactList);
@@ -98,73 +97,32 @@ public class HomeActivity extends AppCompatActivity implements ContactAddedListe
         RecyclerView recyclerView = findViewById(R.id.recyclerViewContacts);
 
         contactAdapter = new ContactAdapter(contactList, this);
+
         recyclerView.setAdapter(contactAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void goToProfileActivity(PersonModel personLogged){
-        networkService.personById(personLogged.getId(), new Callback<PersonModel>() {
-            @Override
-            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
-                if(response.isSuccessful()){
-                    PersonModel updatedPerson = response.body();
-                    Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-                    intent.putExtra("loggedPerson", updatedPerson);
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
-
-            }
-        });
+        networkService.personById(personLogged.getId(),
+                new UpdatedPersonCallback(this, ProfileActivity.class));
     }
 
     private void goToAddContactActivity(PersonModel personLogged){
-        networkService.personById(personLogged.getId(), new Callback<PersonModel>() {
-            @Override
-            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
-                if(response.isSuccessful()){
-                    PersonModel updatedPerson = response.body();
-                    Intent intent = new Intent(HomeActivity.this, AddContactActivity.class);
-                    intent.putExtra("loggedPerson", updatedPerson);
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
-
-            }
-        });
+        networkService.personById(personLogged.getId(),
+                new UpdatedPersonCallback(this, AddContactActivity.class));
     }
 
 
     private void goToSearchContactActivity(PersonModel personLogged){
-        networkService.personById(personLogged.getId(), new Callback<PersonModel>() {
-            @Override
-            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
-                if(response.isSuccessful()){
-                    PersonModel updatedPerson = response.body();
-                    Intent intent = new Intent(HomeActivity.this, SearchContactActivity.class);
-                    intent.putExtra("loggedPerson", updatedPerson);
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
-
-            }
-        });
+        networkService.personById(personLogged.getId(),
+                new UpdatedPersonCallback(this, SearchContactActivity.class));
     }
 
     @Override
     public void onContactAdded() {
         contactViewModel.isContactAdded().observe(this, isAdded -> {
             if (isAdded) {
-                networkService.getContactListForPerson(loggedPerson.getId(), new NetworkService.ContactListListener() {
+                networkService.getContactListForPerson(loggedPerson.getId(), new ContactListListener() {
                     @Override
                     public void onContactListReceived(List<ContactModel> contactList) {
                         contactAdapter.updateContactList(contactList);
@@ -182,7 +140,7 @@ public class HomeActivity extends AppCompatActivity implements ContactAddedListe
     @Override
     protected void onRestart() {
         super.onRestart();
-        networkService.getContactListForPerson(loggedPerson.getId(), new NetworkService.ContactListListener() {
+        networkService.getContactListForPerson(loggedPerson.getId(), new ContactListListener() {
             @Override
             public void onContactListReceived(List<ContactModel> contactList) {
                 contactAdapter.updateContactList(contactList);

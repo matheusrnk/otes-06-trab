@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.client_contacts.R;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.services.NetworkService;
+import com.example.client_contacts.services.services_callbacks.DeleteContactCallback;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -68,27 +69,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     private void deleteItem(int position) {
         ContactModel contactToBeDeleted = contactList.get(position);
 
-        networkService.deleteContact(contactToBeDeleted.getId(), new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if(response.isSuccessful()){
-                    contactList.remove(position);
-                    notifyItemRemoved(position);
-                    showDeletionFeedback();
-                    Log.i("Success", "Contact Deleted");
-                    return;
-                }
-                Log.i("Failed", "Contact Not Deleted!");
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Log.e("Failed", "Contact Not Deleted! " + t.getMessage());
-            }
-        });
+        networkService.deleteContact(contactToBeDeleted.getId(),
+                new DeleteContactCallback(contactList, this, position));
     }
 
-    private void showDeletionFeedback() {
+    public void showDeletionFeedback() {
         Snackbar.make(((Activity) context).findViewById(android.R.id.content),
                 "Contact deleted", Snackbar.LENGTH_SHORT).show();
     }

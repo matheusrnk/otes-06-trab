@@ -1,29 +1,24 @@
-package com.example.client_contacts.activities;
+package com.example.client_contacts.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.client_contacts.R;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
+import com.example.client_contacts.services.services_callbacks.LoginCallback;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Pattern;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity implements Validator.ValidationListener {
 
@@ -63,39 +58,15 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
     }
 
     private void authenticateUser(String phoneNumber, String password){
-        networkService.loginUser(phoneNumber, password, new Callback<PersonModel>() {
-            @Override
-            public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
-                if(response.isSuccessful()){
-                    PersonModel personModelDeserialized = response.body();
-
-                    Log.i("Request Complete", "Successful response: " + response.code());
-                    assert personModelDeserialized != null;
-                    errorTextView.setVisibility(View.GONE);
-                    goToHomeActivity(personModelDeserialized);
-                } else {
-                    Log.e("Request Failed", "Unsuccessful response: " + response.code());
-                    resetFields();
-                    errorTextView.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<PersonModel> call, @NonNull Throwable t) {
-                Log.e("Request Failed", "Error: " + t.getMessage());
-                resetFields();
-                errorTextView.setVisibility(View.VISIBLE);
-            }
-        });
-
+        networkService.loginUser(phoneNumber, password, new LoginCallback(errorTextView, this));
     }
 
-    private void goToRegisterActivity(){
+    public void goToRegisterActivity(){
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
 
-    private void goToHomeActivity(PersonModel personLogged){
+    public void goToHomeActivity(PersonModel personLogged){
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra("loggedPerson", personLogged);
         startActivity(intent);
@@ -121,7 +92,7 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
         }
     }
 
-    private void resetFields(){
+    public void resetFields(){
         editTextPhoneNumber.setText("");
         editTextPassword.setText("");
     }

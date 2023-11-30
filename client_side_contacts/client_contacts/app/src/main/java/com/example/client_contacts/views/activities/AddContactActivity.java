@@ -1,12 +1,11 @@
-package com.example.client_contacts.activities;
+package com.example.client_contacts.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +16,7 @@ import com.example.client_contacts.R;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
+import com.example.client_contacts.services.services_callbacks.AddContactCallback;
 import com.example.client_contacts.views.ContactViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -25,10 +25,6 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Pattern;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class AddContactActivity extends AppCompatActivity implements Validator.ValidationListener {
 
@@ -80,65 +76,29 @@ public class AddContactActivity extends AppCompatActivity implements Validator.V
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationAddContact);
         ImageButton backButton = findViewById(R.id.backButtonToolbarAddContact);
 
-        backButton.setOnClickListener(v -> onSupportNavigateUp());
+        backButton.setOnClickListener(v -> finish());
 
         buttonAddContact.setOnClickListener(v -> validator.validate());
 
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
+        bottomNavigationView.setOnItemSelectedListener(this::guideBottomButtonActions);
+    }
 
-            if(itemId == R.id.nav_profile){
-                goToProfileActivity(loggedPerson);
-                return true;
-            } else if(itemId == R.id.nav_search_contact){
-                goToSearchContactActivity(loggedPerson);
-                return true;
-            }
-            return false;
-        });
+    private boolean guideBottomButtonActions(MenuItem menuItem) {
+        int itemId = menuItem.getItemId();
+
+        if(itemId == R.id.nav_profile){
+            goToProfileActivity(loggedPerson);
+            return true;
+        } else if(itemId == R.id.nav_search_contact){
+            goToSearchContactActivity(loggedPerson);
+            return true;
+        }
+        return false;
     }
 
     private void addContactToPerson(Long id, ContactModel contactModel) {
-        networkService.addContactToPerson(id, contactModel, new Callback<ContactModel>() {
-            @Override
-            public void onResponse(@NonNull Call<ContactModel> call, @NonNull Response<ContactModel> response) {
-                if(response.isSuccessful()){
-                    Log.i("Success!", "Contact Sent!");
-                    errorTextView.setVisibility(View.GONE);
-                    contactViewModel.setContactAdded(true);
-                    finish();
-                    return;
-                }
-                Log.e("Did not succeeded!", "Contact Not Sent!");
-                errorTextView.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ContactModel> call, @NonNull Throwable t) {
-                Log.e("Did not succeeded!", "Contact Not Sent!");
-                errorTextView.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
-    }
-
-    private void goToProfileActivity(PersonModel personLogged){
-        Intent intent = new Intent(this, ProfileActivity.class);
-        intent.putExtra("loggedPerson", personLogged);
-        startActivity(intent);
-        finish();
-    }
-
-    private void goToSearchContactActivity(PersonModel personLogged){
-        Intent intent = new Intent(this, SearchContactActivity.class);
-        intent.putExtra("loggedPerson", personLogged);
-        startActivity(intent);
-        finish();
+        networkService.addContactToPerson(id, contactModel,
+                new AddContactCallback(errorTextView, this, contactViewModel));
     }
 
     @Override
@@ -163,5 +123,20 @@ public class AddContactActivity extends AppCompatActivity implements Validator.V
             }
         }
     }
+
+    private void goToProfileActivity(PersonModel personLogged){
+        Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra("loggedPerson", personLogged);
+        startActivity(intent);
+        finish();
+    }
+
+    private void goToSearchContactActivity(PersonModel personLogged){
+        Intent intent = new Intent(this, SearchContactActivity.class);
+        intent.putExtra("loggedPerson", personLogged);
+        startActivity(intent);
+        finish();
+    }
+
 }
 
