@@ -17,7 +17,7 @@ public class DeleteContactCallback implements Callback<Void> {
 
     private final List<ContactModel> contactModelList;
     private final ContactAdapter contactAdapter;
-    private int position;
+    private final int position;
 
     public DeleteContactCallback(List<ContactModel> contactModelList, ContactAdapter contactAdapter,
                                  int position){
