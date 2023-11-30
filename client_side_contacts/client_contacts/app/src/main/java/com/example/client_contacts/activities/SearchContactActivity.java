@@ -1,27 +1,19 @@
 package com.example.client_contacts.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageButton;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.client_contacts.R;
-import com.example.client_contacts.interfaces.ContactDeletedListener;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.models.PersonModel;
-import com.example.client_contacts.services.NetworkService;
 import com.example.client_contacts.views.ContactAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -31,26 +23,28 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class SearchContactActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewSearchResults;
-    private ContactAdapter contactAdapter;
     private List<ContactModel> searchResults;
-    private ImageButton backButton;
-    private BottomNavigationView bottomNavigationView;
-    private ActivityResultLauncher<Intent> launchAddContactActivity;
+
+    private PersonModel loggedPerson;
+
+    private void retrieveLoggedPerson(){
+        if (getIntent().hasExtra("loggedPerson")) {
+            loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_searchcontact);
 
-        backButton = findViewById(R.id.backButtonToolbarSearchContact);
-        bottomNavigationView = findViewById(R.id.bottomNavigationViewSearchContact);
+        retrieveLoggedPerson();
+
+        ImageButton backButton = findViewById(R.id.backButtonToolbarSearchContact);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationViewSearchContact);
 
         recyclerViewSearchResults = findViewById(R.id.recyclerViewSearchResults);
         recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(this));
@@ -71,12 +65,7 @@ public class SearchContactActivity extends AppCompatActivity {
             }
         });
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -84,16 +73,10 @@ public class SearchContactActivity extends AppCompatActivity {
                 int itemId = item.getItemId();
 
                 if(itemId == R.id.nav_profile){
-                    if (getIntent().hasExtra("loggedPerson")) {
-                        PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
-                        goToProfileActivity(loggedPerson);
-                    }
+                    goToProfileActivity(loggedPerson);
                     return true;
                 } else if(itemId == R.id.nav_add_contact){
-                    if (getIntent().hasExtra("loggedPerson")) {
-                        PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
-                        goToAddContactActivity(loggedPerson);
-                    }
+                    goToAddContactActivity(loggedPerson);
                     return true;
                 }
                 return false;
@@ -106,20 +89,16 @@ public class SearchContactActivity extends AppCompatActivity {
         searchResults.clear();
         searchResults.addAll(getSearchResultsFromAPI(query));
 
-        contactAdapter = new ContactAdapter(searchResults, this);
+        ContactAdapter contactAdapter = new ContactAdapter(searchResults, this);
         recyclerViewSearchResults.setAdapter(contactAdapter);
     }
 
     private List<ContactModel> getSearchResultsFromAPI(String query) {
-        NetworkService networkService = new NetworkService();
-        if (getIntent().hasExtra("loggedPerson")) {
-            PersonModel loggedPerson = (PersonModel) getIntent().getSerializableExtra("loggedPerson");
-
-            assert loggedPerson != null;
-            List<ContactModel> contactModels = loggedPerson.getContactsModelList();
-            return filterContacts(query, contactModels);
+        List<ContactModel> contactModels = loggedPerson.getContactsModelList();
+        if(contactModels == null){
+            return new ArrayList<>();
         }
-        return new ArrayList<>();
+        return filterContacts(query, contactModels);
     }
 
     private List<ContactModel> filterContacts(String query, List<ContactModel> contactModels) {

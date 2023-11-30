@@ -1,6 +1,5 @@
 package com.example.client_contacts.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -45,10 +44,13 @@ public class RegisterActivity extends AppCompatActivity implements Validator.Val
     private EditText editTextPassword;
     private TextView errorTextView;
 
-    private Button registerButton;
-    private Button backButton;
-
     private Validator validator;
+
+    private final NetworkService networkService;
+
+    public RegisterActivity(){
+        networkService = NetworkService.getInstance();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +65,12 @@ public class RegisterActivity extends AppCompatActivity implements Validator.Val
         editTextEmail = findViewById(R.id.editTextEmailRegister);
         editTextPassword = findViewById(R.id.editTextPasswordRegister);
         errorTextView = findViewById(R.id.textViewErrorRegister);
-        registerButton = findViewById(R.id.buttonRegister);
-        backButton = findViewById(R.id.buttonBackToLoginRegister);
+        Button registerButton = findViewById(R.id.buttonRegister);
+        Button backButton = findViewById(R.id.buttonBackToLoginRegister);
 
         registerButton.setOnClickListener(v -> validator.validate());
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void registerUserMethod(NetworkService networkService){
@@ -88,14 +85,10 @@ public class RegisterActivity extends AppCompatActivity implements Validator.Val
             @Override
             public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
                 if(response.isSuccessful()){
-                    PersonModel personModelDeserialized = response.body();
-
-                    int statusCode = response.code();
                     Log.e("Request Succeed", "Successful response: " + response.code());
                     errorTextView.setVisibility(View.GONE);
                     finish();
                 } else {
-                    int statusCode = response.code();
                     Log.e("Request Failed", "Unsuccessful response: " + response.code());
                     errorTextView.setVisibility(View.VISIBLE);
                 }
@@ -111,7 +104,6 @@ public class RegisterActivity extends AppCompatActivity implements Validator.Val
 
     @Override
     public void onValidationSucceeded() {
-        NetworkService networkService = new NetworkService();
         registerUserMethod(networkService);
     }
 

@@ -18,14 +18,22 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetworkService {
 
     private final ApiService apiService;
+    private static NetworkService instance = null;
 
-    public NetworkService() {
+    private NetworkService() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:8080")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         apiService = retrofit.create(ApiService.class);
+    }
+
+    public static NetworkService getInstance(){
+        if(instance == null){
+            instance = new NetworkService();
+        }
+        return instance;
     }
 
     public void registerUser(PersonModel personModel, Callback<PersonModel> callback) {
@@ -51,11 +59,6 @@ public class NetworkService {
     public void deleteContact(Long id, Callback<Void> callback){
         Call<Void> call = apiService.deleteContact(id);
         call.enqueue(callback);
-    }
-
-    public List<ContactModel> searchContacts(String query) {
-
-        return new ArrayList<>();
     }
 
     public interface ContactListListener {

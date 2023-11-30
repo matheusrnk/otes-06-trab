@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.client_contacts.R;
 import com.example.client_contacts.models.PersonModel;
 import com.example.client_contacts.services.NetworkService;
-import com.google.android.material.snackbar.Snackbar;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
@@ -35,10 +34,14 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
     @NotEmpty(message = "Password is required")
     private EditText editTextPassword;
     private TextView errorTextView;
-    private Button buttonLogin;
-    private Button buttonRegister;
 
     private Validator validator;
+
+    private final NetworkService networkService;
+
+    public LoginActivity(){
+        networkService = NetworkService.getInstance();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,30 +54,26 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
         editTextPhoneNumber = findViewById(R.id.editTextPhoneNumberLogin);
         editTextPassword = findViewById(R.id.editTextPasswordLogin);
         errorTextView = findViewById(R.id.textViewErrorLogin);
-        buttonLogin = findViewById(R.id.buttonLogin);
-        buttonRegister = findViewById(R.id.buttonRegisterLogin);
+
+        Button buttonLogin = findViewById(R.id.buttonLogin);
+        Button buttonRegister = findViewById(R.id.buttonRegisterLogin);
 
         buttonLogin.setOnClickListener(v -> validator.validate());
-
         buttonRegister.setOnClickListener(v -> goToRegisterActivity());
     }
 
     private void authenticateUser(String phoneNumber, String password){
-        NetworkService networkService = new NetworkService();
-
         networkService.loginUser(phoneNumber, password, new Callback<PersonModel>() {
             @Override
             public void onResponse(@NonNull Call<PersonModel> call, @NonNull Response<PersonModel> response) {
                 if(response.isSuccessful()){
                     PersonModel personModelDeserialized = response.body();
 
-                    int statusCode = response.code();
                     Log.i("Request Complete", "Successful response: " + response.code());
                     assert personModelDeserialized != null;
                     errorTextView.setVisibility(View.GONE);
                     goToHomeActivity(personModelDeserialized);
                 } else {
-                    int statusCode = response.code();
                     Log.e("Request Failed", "Unsuccessful response: " + response.code());
                     resetFields();
                     errorTextView.setVisibility(View.VISIBLE);

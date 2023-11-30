@@ -8,13 +8,6 @@ import lombok.Data;
 @Data
 public class PersonModel implements Serializable {
 
-    public PersonModel(String name, String phoneNumber, String email, String password) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.password = password;
-    }
-
     private Long id;
     private String name;
     private String phoneNumber;
@@ -24,6 +17,13 @@ public class PersonModel implements Serializable {
 
     public PersonModel() {
 
+    }
+
+    public PersonModel(String name, String phoneNumber, String email, String password) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.password = password;
     }
 
     public void setId(Long id) {

@@ -10,7 +10,7 @@ public class ContactViewModel extends ViewModel {
 
     private static ContactViewModel instance = null;
 
-    private MutableLiveData<Boolean> contactAdded = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> contactAdded = new MutableLiveData<>();
     private ContactAddedListener contactAddedListener;
 
     private ContactViewModel(){}

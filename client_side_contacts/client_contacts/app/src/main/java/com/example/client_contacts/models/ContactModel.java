@@ -16,6 +16,10 @@ public class ContactModel implements Serializable {
     private byte[] photo;
     private PersonModel person;
 
+    public ContactModel(){
+
+    }
+
     public ContactModel(String contactName, String phoneNumber, String email) {
         this.contactName = contactName;
         this.phoneNumber = phoneNumber;

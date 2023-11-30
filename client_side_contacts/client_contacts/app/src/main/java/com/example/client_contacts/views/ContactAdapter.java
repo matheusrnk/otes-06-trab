@@ -8,11 +8,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.client_contacts.R;
-import com.example.client_contacts.interfaces.ContactDeletedListener;
 import com.example.client_contacts.models.ContactModel;
 import com.example.client_contacts.services.NetworkService;
 import com.google.android.material.snackbar.Snackbar;
@@ -30,11 +28,13 @@ import retrofit2.Response;
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
 
     private List<ContactModel> contactList;
-    private Context context;
+    private final Context context;
+    private final NetworkService networkService;
 
     public ContactAdapter(List<ContactModel> contactList, Context context) {
         this.contactList = contactList != null ? contactList : new ArrayList<>();
         this.context = context;
+        networkService = NetworkService.getInstance();
     }
 
     @NonNull
@@ -66,7 +66,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     }
 
     private void deleteItem(int position) {
-        NetworkService networkService = new NetworkService();
         ContactModel contactToBeDeleted = contactList.get(position);
 
         networkService.deleteContact(contactToBeDeleted.getId(), new Callback<Void>() {
@@ -95,10 +94,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     }
 
     public static class ContactViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtName;
-        private TextView txtPhoneNumber;
-        private TextView txtEmail;
-        private ImageView contactPhoto;
+        private final TextView txtName;
+        private final TextView txtPhoneNumber;
+        private final TextView txtEmail;
+        private final ImageView contactPhoto;
 
         public ContactViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -113,7 +112,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             txtPhoneNumber.setText(contact.getPhoneNumber());
             txtEmail.setText(contact.getEmail());
 
-            // Set the photo if available
             if (contact.getPhoto() != null) {
                 contactPhoto.setImageBitmap(contact.getPhoto());
             } else {
