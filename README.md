@@ -4,6 +4,10 @@
 
 Este projeto consiste em um backend Spring Boot e um aplicativo Android desenvolvido em Java usando o Android Studio. Este README fornece instruções sobre como configurar e executar ambos os aplicativos juntos para fins de avaliação.
 
+## Funcionalidades
+
+- Segue o arquivo documentando as funcionalidades do sistema: [Funcionalides](Funcionalidades.pdf)
+
 ## Pré-requisitos
 
 - Java instalado em sua máquina.
@@ -52,7 +56,3 @@ estão as informações sobre o banco de dados que será utilizado.
 
    ![Run App](run.png)
    *Figura 3: Executando o Aplicativo no Emulador*
-
-## Funcionalidades
-
-- Segue o arquivo documentado as funcionalidades do sistema: 
