@@ -1,5 +1,9 @@
 # Aplicativo de Contatos
 
+## Equipe
+- Matheus Sehnem de Oliveira
+- Yuji Yamada Correa
+
 ## Descrição
 
 Este projeto consiste em um backend Spring Boot e um aplicativo Android desenvolvido em Java usando o Android Studio. Este README fornece instruções sobre como configurar e executar ambos os aplicativos juntos para fins de avaliação.
